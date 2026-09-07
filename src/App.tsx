@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RoomAnalysisData, SavedRoomRecord, RoomType, DeclutterGoal } from './types';
+import { getApiUrl } from './utils/apiConfig';
 import { Navbar } from './components/Navbar';
 import { PhotoUploader } from './components/PhotoUploader';
 import { AnalysisResults } from './components/AnalysisResults';
@@ -74,7 +75,7 @@ export default function App() {
     setAnalysisError(null);
 
     try {
-      const response = await fetch('/api/analyze-room', {
+      const response = await fetch(getApiUrl('/api/analyze-room'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

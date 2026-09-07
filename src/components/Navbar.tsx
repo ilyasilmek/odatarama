@@ -1,5 +1,6 @@
-import React from 'react';
-import { Sparkles, Camera, ClipboardList, MessageSquare, Archive, Timer, PlusCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Camera, ClipboardList, MessageSquare, Archive, Timer, PlusCircle, Server } from 'lucide-react';
+import { BackendConfigModal } from './BackendConfigModal';
 
 interface NavbarProps {
   currentTab: 'upload' | 'plan' | 'chat' | 'history';
@@ -18,6 +19,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenTimer,
   onNewRoom,
 }) => {
+  const [showConfigModal, setShowConfigModal] = useState(false);
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-stone-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,9 +127,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="hidden sm:inline">New Room</span>
               </button>
             )}
+
+            <button
+              id="btn-backend-config"
+              onClick={() => setShowConfigModal(true)}
+              className="p-2 rounded-lg text-stone-500 hover:text-stone-800 hover:bg-stone-100 transition-colors"
+              title="Configure API / Backend Service"
+            >
+              <Server className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>
+
+      <BackendConfigModal
+        isOpen={showConfigModal}
+        onClose={() => setShowConfigModal(false)}
+      />
     </header>
   );
 };

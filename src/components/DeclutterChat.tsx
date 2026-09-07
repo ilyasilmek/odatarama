@@ -13,6 +13,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import { ChatMessage, RoomAnalysisData } from '../types';
+import { getApiUrl } from '../utils/apiConfig';
 
 interface DeclutterChatProps {
   roomContext: RoomAnalysisData | null;
@@ -74,7 +75,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
     setErrorMessage(null);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(getApiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
