@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Server, Check, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Server, Check, AlertCircle, RefreshCw, Zap } from 'lucide-react';
+import { DEFAULT_CLOUD_RUN_BACKEND } from '../utils/apiConfig';
 
 interface BackendConfigModalProps {
   isOpen: boolean;
@@ -42,6 +43,11 @@ export const BackendConfigModal: React.FC<BackendConfigModalProps> = ({ isOpen, 
     }
   };
 
+  const handleUseDefaultCloudRun = () => {
+    setBackendUrl(DEFAULT_CLOUD_RUN_BACKEND);
+    setTestStatus('idle');
+  };
+
   const handleSave = () => {
     const clean = backendUrl.trim().replace(/\/+$/, '');
     if (clean) {
@@ -77,9 +83,19 @@ export const BackendConfigModal: React.FC<BackendConfigModalProps> = ({ isOpen, 
 
         <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1.5">
-              Sunucu Servis URL'si
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider">
+                Sunucu Servis URL'si
+              </label>
+              <button
+                type="button"
+                onClick={handleUseDefaultCloudRun}
+                className="inline-flex items-center space-x-1 text-[11px] font-medium text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
+              >
+                <Zap className="w-3 h-3 text-emerald-600" />
+                <span>AI Studio Cloud Run URL'sini Doldur</span>
+              </button>
+            </div>
             <input
               type="url"
               value={backendUrl}

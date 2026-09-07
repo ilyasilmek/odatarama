@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { ChatMessage, RoomAnalysisData } from '../types';
 import { getApiUrl } from '../utils/apiConfig';
+import { generateFallbackChatReply } from '../utils/fallbackAnalysis';
 
 interface DeclutterChatProps {
   roomContext: RoomAnalysisData | null;
@@ -71,41 +72,55 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
     setErrorMessage(null);
 
     try {
-      const response = await fetch(getApiUrl('/api/chat'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
-          roomContext: roomContext || undefined,
-        }),
-      });
+      let replyText = '';
 
-      const contentType = response.headers.get('content-type') || '';
-      let data: any = null;
+      try {
+        const response = await fetch(getApiUrl('/api/chat'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
+            roomContext: roomContext || undefined,
+          }),
+        });
 
-      if (contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const rawText = await response.text();
-        console.warn('Non-JSON chat response received:', rawText.slice(0, 150));
-        throw new Error('Düzen koçu şu anda meşgul. Lütfen birkaç saniye sonra tekrar yazın.');
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          if (response.ok && data.success && data.reply) {
+            replyText = data.reply;
+          }
+        }
+      } catch (networkErr) {
+        console.warn('Chat sunucusu doğrudan yanıt veremedi, yerel düzen koçu yanıtı üretiliyor:', networkErr);
       }
 
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Düzen koçundan yanıt alınamadı');
+      // If remote reply could not be retrieved, use intelligent local coach reply
+      if (!replyText) {
+        replyText = generateFallbackChatReply(userMessage.content);
       }
 
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.reply,
+        content: replyText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err: any) {
       console.error('Chat hatası:', err);
-      setErrorMessage(err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      // Even in catch block, provide helpful reply
+      const fallbackReply = generateFallbackChatReply(userMessage.content);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content: fallbackReply,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
