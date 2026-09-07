@@ -64,27 +64,65 @@ export async function urlToBase64(url: string): Promise<{ base64: string; mimeTy
 
   // If it's a data URI (e.g. SVG), draw to canvas to convert to a real JPEG base64 for Gemini
   if (url.startsWith('data:')) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const img = new Image();
-      img.onload = () => {
+      img.crossOrigin = 'anonymous';
+
+      // Set timeout in case img never loads or errors
+      const timeout = setTimeout(() => {
+        // Create a blank fallback canvas
         const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || 1000;
-        canvas.height = img.naturalHeight || 650;
+        canvas.width = 800;
+        canvas.height = 520;
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          return resolve({ base64: url, mimeType: 'image/svg+xml' });
+        if (ctx) {
+          ctx.fillStyle = '#f1f5f9';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          resolve({ base64: canvas.toDataURL('image/jpeg', 0.85), mimeType: 'image/jpeg' });
+        } else {
+          resolve({ base64: url, mimeType: 'image/jpeg' });
         }
-        // Fill white background before drawing transparent SVG
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-        resolve({ base64: dataUrl, mimeType: 'image/jpeg' });
+      }, 3000);
+
+      img.onload = () => {
+        clearTimeout(timeout);
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 800;
+          canvas.height = img.naturalHeight || 520;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            return resolve({ base64: url, mimeType: 'image/jpeg' });
+          }
+          // Fill solid white background before drawing transparent SVG
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+          resolve({ base64: dataUrl, mimeType: 'image/jpeg' });
+        } catch (err) {
+          console.warn('Canvas rasterization error:', err);
+          resolve({ base64: url, mimeType: 'image/jpeg' });
+        }
       };
-      img.onerror = () => {
-        // Fallback to raw data url if canvas rendering fails
-        resolve({ base64: url, mimeType: 'image/svg+xml' });
+
+      img.onerror = (e) => {
+        clearTimeout(timeout);
+        console.warn('Image load error for data URI:', e);
+        // Rasterize to simple canvas fallback
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 520;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(0, 0, 800, 520);
+          resolve({ base64: canvas.toDataURL('image/jpeg', 0.85), mimeType: 'image/jpeg' });
+        } else {
+          resolve({ base64: url, mimeType: 'image/jpeg' });
+        }
       };
+
       img.src = url;
     });
   }

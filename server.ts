@@ -55,8 +55,37 @@ app.post("/api/analyze-room", async (req, res) => {
 
     const ai = getGeminiClient();
 
-    // Clean base64 string if it has data URL prefix
-    const cleanBase64 = imageBase64.replace(/^data:image\/[a-z0-9+]+;base64,/, "");
+    let cleanBase64 = imageBase64;
+    let finalMimeType = mimeType || "image/jpeg";
+
+    // Handle data URL extraction if present
+    if (typeof cleanBase64 === "string" && cleanBase64.startsWith("data:")) {
+      const match = cleanBase64.match(/^data:([^;]+);base64,(.+)$/s);
+      if (match) {
+        finalMimeType = match[1];
+        cleanBase64 = match[2];
+      } else {
+        const commaIndex = cleanBase64.indexOf(",");
+        if (commaIndex !== -1) {
+          const header = cleanBase64.slice(0, commaIndex);
+          const rawData = cleanBase64.slice(commaIndex + 1);
+          if (header.includes("base64")) {
+            cleanBase64 = rawData;
+          } else {
+            const decoded = decodeURIComponent(rawData);
+            cleanBase64 = Buffer.from(decoded, "utf-8").toString("base64");
+          }
+        }
+      }
+    }
+
+    // Gemini requires JPEG, PNG, WEBP, HEIC, or HEIF (SVG is not supported as raw inline image)
+    if (finalMimeType.includes("svg")) {
+      finalMimeType = "image/png";
+    }
+
+    // Clean whitespace
+    cleanBase64 = cleanBase64.replace(/\s+/g, "");
 
     const promptText = `Sen dünya çapında uzman bir profesyonel organizatör, iç mekan tasarımcısı ve sadeleşme/düzen uzmanısın.
 Bu oda fotoğrafını derinlemesine analiz et ve kullanıcıya empatik, uygulanabilir, motive edici ve adım adım yapılandırılmış bir düzenleme/sadeleştirme planı sun.
@@ -134,36 +163,39 @@ SADECE geçerli ham JSON döndür, markdown kod bloğu veya ekstra metin ekleme.
 
     const imagePart = {
       inlineData: {
-        mimeType: mimeType || "image/jpeg",
+        mimeType: finalMimeType || "image/jpeg",
         data: cleanBase64,
       },
     };
 
     let responseText = "";
-    // First try gemini-3.1-pro-preview as specified in prompt, fallback to gemini-3.8-flash if needed
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: {
-          parts: [imagePart, { text: promptText }],
-        },
-        config: {
-          responseMimeType: "application/json",
-        },
-      });
-      responseText = response.text || "";
-    } catch (proError: any) {
-      console.warn("gemini-3.1-pro-preview error, falling back to gemini-3.8-flash:", proError?.message);
-      const fallbackResponse = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents: {
-          parts: [imagePart, { text: promptText }],
-        },
-        config: {
-          responseMimeType: "application/json",
-        },
-      });
-      responseText = fallbackResponse.text || "";
+    // Priority order: gemini-3.1-flash-lite (fast & robust), then gemini-flash-latest, then gemini-3.8-flash
+    const candidateModels = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+    let lastError: any = null;
+
+    for (const modelName of candidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: {
+            parts: [imagePart, { text: promptText }],
+          },
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+        if (response.text) {
+          responseText = response.text;
+          break;
+        }
+      } catch (err: any) {
+        console.warn(`Model ${modelName} failed, trying next fallback:`, err?.message || err);
+        lastError = err;
+      }
+    }
+
+    if (!responseText) {
+      throw lastError || new Error("Yapay zeka modellerinden yanıt alınamadı");
     }
 
     // Clean JSON if needed
@@ -218,25 +250,30 @@ Tavsiyelerde bulunurken bu oda analizindeki detaylara doğal bir şekilde atıft
     }));
 
     let replyText = "";
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: formattedContents,
-        config: {
-          systemInstruction,
-        },
-      });
-      replyText = response.text || "";
-    } catch (flashError: any) {
-      console.warn("gemini-3.5-flash chat error, trying gemini-3.8-flash:", flashError?.message);
-      const fallbackResponse = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
-        contents: formattedContents,
-        config: {
-          systemInstruction,
-        },
-      });
-      replyText = fallbackResponse.text || "";
+    const chatCandidateModels = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.8-flash"];
+    let lastChatError: any = null;
+
+    for (const modelName of chatCandidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: formattedContents,
+          config: {
+            systemInstruction,
+          },
+        });
+        if (response.text) {
+          replyText = response.text;
+          break;
+        }
+      } catch (err: any) {
+        console.warn(`Chat model ${modelName} failed, trying next fallback:`, err?.message || err);
+        lastChatError = err;
+      }
+    }
+
+    if (!replyText) {
+      throw lastChatError || new Error("Yapay zeka koçundan yanıt alınamadı");
     }
 
     res.json({ success: true, reply: replyText });
@@ -247,6 +284,18 @@ Tavsiyelerde bulunurken bu oda analizindeki detaylara doğal bir şekilde atıft
       details: String(error),
     });
   }
+});
+
+// Global error handler ensuring all API errors return JSON instead of HTML
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error("Global Express Error:", err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || "Sunucuda beklenmeyen bir hata oluştu.",
+  });
 });
 
 async function startServer() {

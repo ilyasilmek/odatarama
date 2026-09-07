@@ -80,7 +80,17 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
         }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      let data: any = null;
+
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const rawText = await response.text();
+        console.warn('Non-JSON chat response received:', rawText.slice(0, 150));
+        throw new Error('Düzen koçu şu anda meşgul. Lütfen birkaç saniye sonra tekrar yazın.');
+      }
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Düzen koçundan yanıt alınamadı');
       }

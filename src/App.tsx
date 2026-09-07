@@ -81,10 +81,19 @@ export default function App() {
         body: JSON.stringify(payload),
       });
 
-      const resData = await response.json();
+      const contentType = response.headers.get('content-type') || '';
+      let resData: any = null;
+
+      if (contentType.includes('application/json')) {
+        resData = await response.json();
+      } else {
+        const rawText = await response.text();
+        console.warn('Non-JSON response received:', rawText.slice(0, 150));
+        throw new Error('Sunucudan beklenmeyen bir yanıt alındı. Lütfen birkaç saniye sonra tekrar deneyin.');
+      }
 
       if (!response.ok || !resData.success) {
-        throw new Error(resData.error || 'Room analysis failed');
+        throw new Error(resData.error || 'Oda analizi tamamlanamadı. Lütfen tekrar deneyin.');
       }
 
       const analysisResult: RoomAnalysisData = resData.data;
