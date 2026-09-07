@@ -3,6 +3,7 @@ import { UploadCloud, Camera, Image as ImageIcon, Sparkles, Check, AlertCircle, 
 import { RoomType, DeclutterGoal, SampleRoom } from '../types';
 import { SAMPLE_ROOMS } from '../data/sampleRooms';
 import { fileToBase64, urlToBase64 } from '../utils/imageHelper';
+import { CameraModal } from './CameraModal';
 
 interface PhotoUploaderProps {
   onAnalyze: (payload: {
@@ -51,6 +52,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(null);
   const [isLoadingSample, setIsLoadingSample] = useState<boolean>(false);
+  const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -198,11 +200,11 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        cameraInputRef.current?.click();
+                        setIsCameraOpen(true);
                       }}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 shadow-2xs cursor-pointer"
+                      className="inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 border border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-2xs cursor-pointer transition-colors"
                     >
-                      <Camera className="w-3.5 h-3.5 mr-1.5 text-stone-600" />
+                      <Camera className="w-3.5 h-3.5 mr-1.5 text-emerald-700" />
                       Kamera ile Çek
                     </button>
                     <button
@@ -231,15 +233,25 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                   <span className="bg-black/50 backdrop-blur px-2.5 py-1 rounded-md">
                     Gemini Mekansal Analizi İçin Hazır
                   </span>
-                  <button
-                    onClick={() => {
-                      setSelectedImage(null);
-                      setSelectedSampleId(null);
-                    }}
-                    className="bg-white/90 hover:bg-white text-stone-900 px-3 py-1 rounded-md font-medium transition cursor-pointer"
-                  >
-                    Fotoğrafı Değiştir
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsCameraOpen(true)}
+                      className="bg-stone-900/80 hover:bg-stone-900 text-white px-2.5 py-1 rounded-md font-medium transition cursor-pointer flex items-center space-x-1"
+                    >
+                      <Camera className="w-3 h-3" />
+                      <span>Kamera</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedImage(null);
+                        setSelectedSampleId(null);
+                      }}
+                      className="bg-white/90 hover:bg-white text-stone-900 px-3 py-1 rounded-md font-medium transition cursor-pointer"
+                    >
+                      Fotoğrafı Değiştir
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -387,6 +399,16 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
           </div>
         </div>
       </div>
+
+      <CameraModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={(img) => {
+          setSelectedImage(img);
+          setMimeType('image/jpeg');
+          setSelectedSampleId(null);
+        }}
+      />
     </div>
   );
 };
