@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Play, Pause, RotateCcw, Timer, CheckCircle, Bell } from 'lucide-react';
+import { X, Play, Pause, RotateCcw, Timer, CheckCircle } from 'lucide-react';
 
 interface TimerModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface TimerModalProps {
 export const TimerModal: React.FC<TimerModalProps> = ({
   isOpen,
   onClose,
-  taskTitle = 'Declutter Sprint',
+  taskTitle = 'Toparlama Deparı',
   initialMinutes = 5,
 }) => {
   const [secondsLeft, setSecondsLeft] = useState(initialMinutes * 60);
@@ -47,7 +47,7 @@ export const TimerModal: React.FC<TimerModalProps> = ({
         osc.start();
         osc.stop(audioCtx.currentTime + 0.8);
       } catch (e) {
-        console.log('Audio not supported or permitted');
+        console.log('Ses çalınamadı veya desteklenmiyor');
       }
     }
     return () => clearInterval(interval);
@@ -77,7 +77,7 @@ export const TimerModal: React.FC<TimerModalProps> = ({
       <div className="bg-white rounded-3xl border border-stone-200 shadow-xl max-w-sm w-full p-6 text-center relative overflow-hidden">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -86,7 +86,7 @@ export const TimerModal: React.FC<TimerModalProps> = ({
           <Timer className="w-6 h-6" />
         </div>
 
-        <h3 className="text-lg font-bold text-stone-900">Focused Declutter Sprint</h3>
+        <h3 className="text-lg font-bold text-stone-900">Odaklanmış Toparlama Sayacı</h3>
         <p className="text-xs text-stone-500 mt-0.5 line-clamp-1 px-4">{taskTitle}</p>
 
         {/* Circular / Large Digital Display */}
@@ -96,11 +96,11 @@ export const TimerModal: React.FC<TimerModalProps> = ({
           </div>
           {secondsLeft === 0 ? (
             <div className="mt-2 text-xs font-semibold text-emerald-600 flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 mr-1" /> Great job! Sprint finished!
+              <CheckCircle className="w-4 h-4 mr-1" /> Harika iş çıkardınız! Süre tamamlandı!
             </div>
           ) : (
             <div className="mt-2 text-xs text-stone-400">
-              {isRunning ? 'Timer running — focus on this task!' : 'Paused'}
+              {isRunning ? 'Sayaç çalışıyor — sadece bu göreve odaklanın!' : 'Duraklatıldı'}
             </div>
           )}
 
@@ -119,13 +119,13 @@ export const TimerModal: React.FC<TimerModalProps> = ({
             <button
               key={mins}
               onClick={() => handleSelectPreset(mins)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 selectedDuration === mins
                   ? 'bg-stone-900 text-white shadow-2xs'
                   : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
               }`}
             >
-              {mins}m
+              {mins} dk
             </button>
           ))}
         </div>
@@ -134,15 +134,15 @@ export const TimerModal: React.FC<TimerModalProps> = ({
         <div className="flex items-center justify-center space-x-3">
           <button
             onClick={handleReset}
-            className="p-3 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-100 transition"
-            title="Reset timer"
+            className="p-3 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-100 transition cursor-pointer"
+            title="Sayacı sıfırla"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
 
           <button
             onClick={() => setIsRunning(!isRunning)}
-            className={`px-6 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 transition shadow-xs ${
+            className={`px-6 py-3 rounded-xl font-semibold text-sm flex items-center space-x-2 transition shadow-xs cursor-pointer ${
               isRunning
                 ? 'bg-amber-500 hover:bg-amber-600 text-white'
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
@@ -151,12 +151,12 @@ export const TimerModal: React.FC<TimerModalProps> = ({
             {isRunning ? (
               <>
                 <Pause className="w-4 h-4" />
-                <span>Pause</span>
+                <span>Duraklat</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4" />
-                <span>{secondsLeft === 0 ? 'Restart' : 'Start Sprint'}</span>
+                <span>{secondsLeft === 0 ? 'Yeniden Başlat' : 'Sayacı Başlat'}</span>
               </>
             )}
           </button>

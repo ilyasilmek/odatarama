@@ -31,12 +31,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-semibold text-lg text-stone-900 tracking-tight">Room Declutter AI</span>
+                <span className="font-semibold text-lg text-stone-900 tracking-tight">Oda Tarama AI</span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                   Gemini Vision
                 </span>
               </div>
-              <p className="text-xs text-stone-500 hidden sm:block">AI-powered spatial organization &amp; decluttering plans</p>
+              <p className="text-xs text-stone-500 hidden sm:block">Yapay zeka ile oda analizi ve adım adım düzenleme planı</p>
             </div>
           </div>
 
@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Camera className="w-4 h-4" />
-              <span>Analyze</span>
+              <span>Analiz Et</span>
             </button>
 
             {hasActiveRoom && (
@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }`}
               >
                 <ClipboardList className="w-4 h-4" />
-                <span>Room Plan</span>
+                <span>Düzen Planı</span>
               </button>
             )}
 
@@ -80,9 +80,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <MessageSquare className="w-4 h-4" />
-              <span>Coach Chat</span>
+              <span>Düzen Koçu</span>
               {hasActiveRoom && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Room context attached" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Oda analizi eklendi" />
               )}
             </button>
 
@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Archive className="w-4 h-4" />
-              <span>Saved</span>
+              <span>Kayıtlar</span>
               {savedRoomsCount > 0 && (
                 <span className="ml-1 px-1.5 py-0.2 rounded-full text-xs bg-stone-200 text-stone-700">
                   {savedRoomsCount}
@@ -111,10 +111,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="btn-declutter-timer"
               onClick={onOpenTimer}
               className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-stone-300 text-stone-700 hover:bg-stone-100 transition-colors"
-              title="Quick Declutter Sprint Timer"
+              title="Hızlı 15 Dakikalık Toparlama Sayacı"
             >
               <Timer className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Sprint Timer</span>
+              <span>Sprint Sayacı</span>
             </button>
 
             {hasActiveRoom && (
@@ -124,7 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-xs"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">New Room</span>
+                <span className="hidden sm:inline">Yeni Oda</span>
               </button>
             )}
 
@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="btn-backend-config"
               onClick={() => setShowConfigModal(true)}
               className="p-2 rounded-lg text-stone-500 hover:text-stone-800 hover:bg-stone-100 transition-colors"
-              title="Configure API / Backend Service"
+              title="API / Sunucu Bağlantı Ayarları"
             >
               <Server className="w-4 h-4" />
             </button>

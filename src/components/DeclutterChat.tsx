@@ -6,10 +6,6 @@ import {
   User,
   Loader2,
   Trash2,
-  HelpCircle,
-  Clock,
-  Layers,
-  HeartHandshake,
   Lightbulb,
 } from 'lucide-react';
 import { ChatMessage, RoomAnalysisData } from '../types';
@@ -21,11 +17,11 @@ interface DeclutterChatProps {
 }
 
 const DEFAULT_PROMPTS = [
-  'Where is the best place to start in this room?',
-  'How do I decide between Keep vs. Donate?',
-  'I have sentimental items I cannot let go of. How do I handle them?',
-  'What are the most budget-friendly cable management hacks?',
-  'I feel completely overwhelmed. Give me one 5-minute task right now.',
+  'Bu odada başlamak için en iyi köşe neresi?',
+  'Bir eşyayı Saklamak mı yoksa Bağışlamak mı gerektiğine nasıl karar veririm?',
+  'Manevi değeri olan eşyalarla nasıl başa çıkabilirim?',
+  'Kablo karmaşasını en ucuz ve pratik şekilde nasıl gizlerim?',
+  'Kendimi çok bunalmış hissediyorum. Şu an yapabileceğim 5 dakikalık tek bir görev ver.',
 ];
 
 export const DeclutterChat: React.FC<DeclutterChatProps> = ({
@@ -37,8 +33,8 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
       id: 'welcome-1',
       role: 'assistant',
       content: roomContext
-        ? `Hello! I'm Coach ClutterClear, your personal decluttering and organization guide. I've reviewed your ${roomContext.roomType} photo and analysis (Clutter Score: ${roomContext.clutterScore}/10). What specific corner or challenge would you like to tackle first?`
-        : `Hello! I'm Coach ClutterClear, your empathetic decluttering and organization specialist. Whether you want to purge a crowded closet, organize a messy desk, or overcome decluttering paralysis, I'm here to guide you step by step. How can I help you today?`,
+        ? `Merhaba! Ben Düzen Koçunuz (Coach ClutterClear). ${roomContext.roomType} odanızın fotoğrafını ve analizini inceledim (Dağınıklık Puanı: ${roomContext.clutterScore}/10). Hangi köşeden veya adımdan başlamak istersiniz?`
+        : `Merhaba! Ben Düzen Koçunuz (Coach ClutterClear). İster kalabalık bir dolabı sadeleştirmek, ister dağınık bir çalışma masasını toplamak isteyin; size adım adım rehberlik etmek için buradayım. Bugün nereden başlamak istersiniz?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -86,7 +82,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
 
       const data = await response.json();
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to receive reply from coach');
+        throw new Error(data.error || 'Düzen koçundan yanıt alınamadı');
       }
 
       const assistantMessage: ChatMessage = {
@@ -98,20 +94,20 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err: any) {
-      console.error('Chat error:', err);
-      setErrorMessage(err?.message || 'Something went wrong. Please try again.');
+      console.error('Chat hatası:', err);
+      setErrorMessage(err?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleClearHistory = () => {
-    if (window.confirm('Reset conversation history with Coach ClutterClear?')) {
+    if (window.confirm('Düzen Koçu ile olan sohbet geçmişini sıfırlamak istiyor musunuz?')) {
       setMessages([
         {
           id: `welcome-${Date.now()}`,
           role: 'assistant',
-          content: 'Chat history reset. How can I assist you with your space today?',
+          content: 'Sohbet geçmişi sıfırlandı. Odanız ve eşyalarınızla ilgili bugün size nasıl yardımcı olabilirim?',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -129,13 +125,13 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-semibold text-stone-900 text-sm sm:text-base">Coach ClutterClear</h3>
+                <h3 className="font-semibold text-stone-900 text-sm sm:text-base">Düzen Koçu</h3>
                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                  AI Organizer
+                  Yapay Zeka
                 </span>
               </div>
               <p className="text-xs text-stone-500">
-                Multi-turn decluttering, spatial planning &amp; habit guidance
+                Oda düzenleme, 4-Kutu yöntemi ve kalıcı alışkanlık danışmanlığı
               </p>
             </div>
           </div>
@@ -143,8 +139,8 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
           <div className="flex items-center space-x-2">
             <button
               onClick={handleClearHistory}
-              className="p-2 text-stone-400 hover:text-stone-600 rounded-lg hover:bg-stone-200/60 transition"
-              title="Clear conversation"
+              className="p-2 text-stone-400 hover:text-stone-600 rounded-lg hover:bg-stone-200/60 transition cursor-pointer"
+              title="Sohbeti temizle"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -158,17 +154,16 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
               {roomPhotoUrl && (
                 <img
                   src={roomPhotoUrl}
-                  alt="Room Thumbnail"
+                  alt="Oda Küçük Resmi"
                   className="w-6 h-6 rounded-md object-cover shrink-0"
-                  referrerPolicy="no-referrer"
                 />
               )}
               <span className="font-medium truncate">
-                Active Room Context: <strong>{roomContext.roomType}</strong> (Score: {roomContext.clutterScore}/10)
+                Aktif Oda Analizi: <strong>{roomContext.roomType}</strong> (Puan: {roomContext.clutterScore}/10)
               </span>
             </div>
             <span className="text-[10px] uppercase font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded shrink-0">
-              Context Attached
+              Oda Bilgisi Bağlı
             </span>
           </div>
         )}
@@ -190,7 +185,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
                   {isUser ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
                 </div>
 
-                <div className={`max-w-[82%] sm:max-w-[75%] space-y-1`}>
+                <div className="max-w-[82%] sm:max-w-[75%] space-y-1">
                   <div
                     className={`p-3.5 sm:p-4 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap ${
                       isUser
@@ -217,7 +212,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
               </div>
               <div className="p-3.5 rounded-2xl bg-white border border-stone-200 shadow-2xs rounded-tl-xs flex items-center space-x-2 text-stone-600 text-xs sm:text-sm">
                 <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                <span>Coach ClutterClear is thinking...</span>
+                <span>Düzen Koçu düşünüyor...</span>
               </div>
             </div>
           )}
@@ -236,7 +231,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
           <div className="flex items-center space-x-2 text-xs">
             <span className="text-stone-400 flex items-center shrink-0">
               <Lightbulb className="w-3.5 h-3.5 mr-1 text-amber-500" />
-              Suggestions:
+              Örnek Sorular:
             </span>
             {DEFAULT_PROMPTS.map((prompt, pIdx) => (
               <button
@@ -266,7 +261,7 @@ export const DeclutterChat: React.FC<DeclutterChatProps> = ({
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Coach ClutterClear anything about organizing, sorting, or pacing..."
+              placeholder="Düzen Koçuna eşya ayıklama, kablo gizleme veya oda düzeni hakkında dilediğinizi sorun..."
               disabled={isLoading}
               className="flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-900 placeholder-stone-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-hidden"
             />

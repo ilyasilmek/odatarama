@@ -58,77 +58,79 @@ app.post("/api/analyze-room", async (req, res) => {
     // Clean base64 string if it has data URL prefix
     const cleanBase64 = imageBase64.replace(/^data:image\/[a-z0-9+]+;base64,/, "");
 
-    const promptText = `You are a world-class professional organizer, spatial designer, and decluttering expert.
-Analyze this room photo thoroughly to provide an empathetic, highly actionable, structured decluttering and organization plan.
+    const promptText = `Sen dünya çapında uzman bir profesyonel organizatör, iç mekan tasarımcısı ve sadeleşme/düzen uzmanısın.
+Bu oda fotoğrafını derinlemesine analiz et ve kullanıcıya empatik, uygulanabilir, motive edici ve adım adım yapılandırılmış bir düzenleme/sadeleştirme planı sun.
 
-Context:
-- Specified Room Type: ${roomType}
-- User's Goal: ${goal}
-${focusNotes ? `- User's Specific Concerns / Notes: ${focusNotes}` : ""}
+ÖNEMLİ KURAL: Tüm çıktı ve metinler (özetler, sorunlar, hızlı kazanım başlıkları, bölgeler, 4-kutu eylem planı adımları, profesyonel ipuçları, depolama önerileri ve alışkanlıklar) tamamen TÜRKÇE olmalıdır.
 
-Please evaluate:
-1. Clutter level assessment (score from 1 to 10 where 1 is pristine minimal, 10 is severe overload).
-2. Root causes of clutter in this specific scene (e.g. lack of designated drop zones, overflow on horizontal surfaces, unused vertical space, cable hazards).
-3. 3 "Quick Wins" that can be completed in 5 minutes or less to build immediate psychological momentum.
-4. Specific physical zones identified in the picture (e.g. Desk Workstation, Floor Corner, Bed/Nightstand, Bookshelf, Storage Rack, Entry Pathway).
-5. A comprehensive step-by-step action plan using the 4-Box Method (Keep, Donate/Sell, Relocate, Trash/Recycle).
-6. Smart storage solutions and organizational tools specifically suitable for what you see in the photo (bins, vertical organizers, cable management, hooks, dividers).
-7. Daily/weekly micro-habits to sustain the space effortlessly.
+Bağlam:
+- Seçilen Oda Türü: ${roomType}
+- Kullanıcının Hedefi: ${goal}
+${focusNotes ? `- Kullanıcının Özel Notları / Endişeleri: ${focusNotes}` : ""}
 
-You MUST respond strictly with a valid JSON object matching this structure:
+Lütfen şunları değerlendir:
+1. Dağınıklık seviyesi puanı (1: Tertemiz/Minimalist - 10: Aşırı derecede tıkanmış/dağınık).
+2. Bu sahnede görülen temel dağınıklık nedenleri (ör. yatay yüzeylerin taşması, kablo karmaşası, dikey alanların kullanılmaması, geçiş alanlarının tıkanması).
+3. Kullanıcıya hemen moral ve ivme kazandıracak, 5 dakikadan kısa süren 3 adet "Hızlı Kazanım" (Quick Win).
+4. Fotoğrafta tespit edilen spesifik fiziksel bölgeler (ör. Çalışma Masası Yüzeyi, Zemin Köşesi, Kitaplık, Gardırop, vb.).
+5. 4-Kutu Yöntemini (Sakla, Bağışla / Sat, Yerini Değiştir, At / Geri Dönüştür) kullanan adım adım eylem planı.
+6. Bu fotoğraftaki duruma uygun akıllı depolama ve düzenleme araçları (kablo toplayıcı, sepet, bölücü kutu, raf vb.).
+7. Düzenin kalıcı olmasını sağlayacak günlük ve haftalık mikro alışkanlıklar.
+
+MUTLAKA aşağıdaki JSON şablonuna birebir uyan geçerli bir JSON nesnesi döndür:
 {
   "roomType": "${roomType}",
   "clutterScore": 7,
-  "clutterLevel": "Moderate",
-  "summary": "Short 2-sentence compassionate summary of current state and potential.",
+  "clutterLevel": "Orta",
+  "summary": "Mevcut durum ve odanın potansiyeli hakkında 2 cümlelik samimi Türkçe özet.",
   "keyIssues": [
-    "Issue 1",
-    "Issue 2",
-    "Issue 3"
+    "1. Tespit edilen sorun",
+    "2. Tespit edilen sorun",
+    "3. Tespit edilen sorun"
   ],
   "quickWins": [
     {
-      "task": "Action title",
-      "duration": "3 mins",
-      "impact": "Why it helps immediately"
+      "task": "Hemen yapılabilecek küçük görev",
+      "duration": "3 dk",
+      "impact": "Neden hemen ferahlık sağlayacağı"
     }
   ],
   "zones": [
     {
-      "zoneName": "Name of zone seen in photo",
-      "currentObservation": "What is visible here",
-      "recommendation": "Specific organizing solution",
-      "suggestedProducts": ["Product / tool 1", "Product / tool 2"]
+      "zoneName": "Fotoğrafta Görülen Bölge Adı",
+      "currentObservation": "Burada neyin dağınık olduğu",
+      "recommendation": "Spesifik düzenleme çözümü",
+      "suggestedProducts": ["Önerilen araç / ürün 1", "Önerilen araç / ürün 2"]
     }
   ],
   "actionPlan": [
     {
       "id": "step-1",
-      "title": "Clear the Primary Flat Surface",
+      "title": "Ana Yatay Yüzeyi Temizle",
       "category": "declutter",
-      "timeEstimate": "15 mins",
-      "boxMethodCategory": "Relocate & Keep",
-      "description": "Detailed instructions on what items to tackle and how.",
-      "proTip": "Helpful insider tip for this step"
+      "timeEstimate": "15 dk",
+      "boxMethodCategory": "Yerini Değiştir",
+      "description": "Neler yapılması gerektiğine dair adım adım açıklama.",
+      "proTip": "Uzmandan pratik bir püf noktası"
     }
   ],
   "storageSolutions": [
     {
-      "title": "Solution Name",
-      "purpose": "What problem it solves in this space",
-      "placement": "Where to install or place it"
+      "title": "Çözüm / Ürün Adı",
+      "purpose": "Bu alanda hangi problemi çözdüğü",
+      "placement": "Odanın neresine yerleştirileceği"
     }
   ],
   "maintenanceHabits": [
     {
-      "habit": "Habit Name",
-      "frequency": "Daily (2 mins)",
-      "description": "Short explanation of the habit"
+      "habit": "Alışkanlık Adı",
+      "frequency": "Her Gün (2 dk)",
+      "description": "Alışkanlığın kısa ve motive edici açıklaması"
     }
   ]
 }
 
-Return ONLY the raw JSON without markdown code fences or backticks.`;
+SADECE geçerli ham JSON döndür, markdown kod bloğu veya ekstra metin ekleme.`;
 
     const imagePart = {
       inlineData: {
@@ -189,23 +191,24 @@ app.post("/api/chat", async (req, res) => {
 
     const ai = getGeminiClient();
 
-    let systemInstruction = `You are "ClutterClear", an empathetic, encouraging, and highly practical professional organizer, decluttering coach, and interior space optimizer.
+    let systemInstruction = `Sen "Düzen Koçu"sun (Coach ClutterClear); empatik, cesaretlendirici, motive edici ve son derece pratik bir profesyonel oda düzenleme, sadeleşme ve mekan optimizasyonu uzmanısın.
 
-Your mission:
-- Guide the user step-by-step through sorting, purging, and organizing their space.
-- Keep tone warm, constructive, and free of judgment or shame. Decluttering is emotional and exhausting; validate their efforts.
-- Break overwhelming tasks down into bite-sized 5 to 15-minute micro-steps.
-- Provide concrete tactics: the 4-Box Method (Keep, Donate, Relocate, Trash), the "One In, One Out" rule, Marie Kondo spark-joy decision filtering, containerizing, vertical space utilization, and cable management.
-- When asked about sentimental items, suggest memory boxes, photographing items before donating, or honoring memories without hoarding bulk.`;
+Görevin ve Kuralların:
+- HER ZAMAN TÜRKÇE konuş ve yanıt ver.
+- Kullanıcıya odasını ayıklama, sadeleştirme ve organize etme sürecinde adım adım rehberlik et.
+- Dilin daima sıcak, yapıcı, yargısız ve motive edici olsun. Dağınıklık duygusal bir yüktür ve yorucudur; kullanıcının emeğini ve küçük adımlarını takdir et.
+- Göz korkutucu büyük görevleri 5 ila 15 dakikalık ufak, lokma büyüklüğünde mikro adımlara böl.
+- Somut teknikler öner: 4 Kutu Yöntemi (Sakla, Bağışla, Yerini Değiştir, At), "Biri Gelirse Biri Gider" kuralı, dikey alan kullanımı, kutulama/sepetleme sistemleri ve kablo gizleme yöntemleri.
+- Manevi değeri olan eşyalar sorulduğunda: Anı kutusu yapma, eşyanın fotoğrafını çekip bağışlama veya fiziksel yer kaplamadan hatırayı yaşatma yollarını nazikçe tavsiye et.`;
 
     if (roomContext) {
-      systemInstruction += `\n\nCURRENT ROOM ANALYSIS CONTEXT:
-- Room Type: ${roomContext.roomType || "Unknown"}
-- Clutter Score: ${roomContext.clutterScore || "N/A"}/10 (${roomContext.clutterLevel || "N/A"})
-- Summary: ${roomContext.summary || "N/A"}
-- Key Issues Detected: ${JSON.stringify(roomContext.keyIssues || [])}
-- Identified Zones: ${JSON.stringify((roomContext.zones || []).map((z: any) => z.zoneName))}
-Reference these specific room details naturally when giving advice.`;
+      systemInstruction += `\n\nMEVCUT ODA ANALİZİ BAĞLAMI:
+- Oda Türü: ${roomContext.roomType || "Bilinmiyor"}
+- Dağınıklık Puanı: ${roomContext.clutterScore || "N/A"}/10 (${roomContext.clutterLevel || "N/A"})
+- Özet: ${roomContext.summary || "N/A"}
+- Tespit Edilen Temel Sorunlar: ${JSON.stringify(roomContext.keyIssues || [])}
+- İncelenen Bölgeler: ${JSON.stringify((roomContext.zones || []).map((z: any) => z.zoneName))}
+Tavsiyelerde bulunurken bu oda analizindeki detaylara doğal bir şekilde atıfta bulun.`;
     }
 
     // Format chat contents

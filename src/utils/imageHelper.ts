@@ -50,9 +50,45 @@ export async function fileToBase64(file: File, maxDimension = 1600): Promise<{ b
 }
 
 /**
- * Fetch a remote image URL (e.g. from sample rooms) and convert to base64
+ * Fetch a remote image URL or process a data URI (e.g. SVG or JPG) and convert to base64 JPEG
  */
 export async function urlToBase64(url: string): Promise<{ base64: string; mimeType: string }> {
+  // If already a base64 JPEG/PNG, return immediately
+  if (url.startsWith('data:image/jpeg') || url.startsWith('data:image/png')) {
+    const mimeMatch = url.match(/^data:(image\/[a-zA-Z+]+);base64,/);
+    return {
+      base64: url,
+      mimeType: mimeMatch ? mimeMatch[1] : 'image/jpeg',
+    };
+  }
+
+  // If it's a data URI (e.g. SVG), draw to canvas to convert to a real JPEG base64 for Gemini
+  if (url.startsWith('data:')) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || 1000;
+        canvas.height = img.naturalHeight || 650;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return resolve({ base64: url, mimeType: 'image/svg+xml' });
+        }
+        // Fill white background before drawing transparent SVG
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        resolve({ base64: dataUrl, mimeType: 'image/jpeg' });
+      };
+      img.onerror = () => {
+        // Fallback to raw data url if canvas rendering fails
+        resolve({ base64: url, mimeType: 'image/svg+xml' });
+      };
+      img.src = url;
+    });
+  }
+
   try {
     const response = await fetch(url, { mode: 'cors' });
     const blob = await response.blob();
@@ -80,11 +116,18 @@ export async function urlToBase64(url: string): Promise<{ base64: string; mimeTy
         if (!ctx) {
           return reject(new Error('Canvas context unavailable'));
         }
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        resolve({ base64: dataUrl, mimeType: 'image/jpeg' });
+        try {
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          resolve({ base64: dataUrl, mimeType: 'image/jpeg' });
+        } catch {
+          // If canvas tainted, return url as-is
+          resolve({ base64: url, mimeType: 'image/jpeg' });
+        }
       };
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => resolve({ base64: url, mimeType: 'image/jpeg' });
       img.src = url;
     });
   }

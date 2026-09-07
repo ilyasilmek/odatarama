@@ -17,25 +17,25 @@ interface PhotoUploaderProps {
 }
 
 const ROOM_TYPES: RoomType[] = [
-  'Home Office',
-  'Living Room',
-  'Bedroom',
-  'Kitchen',
-  'Closet & Wardrobe',
-  'Bathroom',
-  'Garage & Storage',
-  'Dining Room',
-  'Entryway / Hallway',
-  'Kids Room',
+  'Ev Ofisi / Çalışma Masası',
+  'Oturma Odası / Salon',
+  'Yatak Odası',
+  'Mutfak & Kiler',
+  'Gardırop & Giysi Dolabı',
+  'Banyo',
+  'Depo & Garaj',
+  'Yemek Odası',
+  'Antre / Koridor',
+  'Çocuk Odası',
 ];
 
 const DECLUTTER_GOALS: DeclutterGoal[] = [
-  'General Decluttering & Space Revival',
-  'Deep 4-Box Purge (Keep/Donate/Trash)',
-  'Maximize Storage & Floor Space',
-  'Desk & Cable Management',
-  'Wardrobe & Closet Streamlining',
-  'Quick 15-Minute Emergency Tidy',
+  'Genel Düzenleme & Alan Canlandırma',
+  'Derinlemesine 4 Kutu Yöntemi (Sakla/Bağışla/At)',
+  'Maksimum Depolama & Zemin Alanı Kazanma',
+  'Masa & Kablo Yönetimi',
+  'Gardırop & Dolap Sadeleştirme',
+  '15 Dakikalık Acil Toparlama',
 ];
 
 export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
@@ -45,8 +45,8 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string>('image/jpeg');
-  const [roomType, setRoomType] = useState<RoomType>('Home Office');
-  const [goal, setGoal] = useState<DeclutterGoal>('General Decluttering & Space Revival');
+  const [roomType, setRoomType] = useState<RoomType>('Ev Ofisi / Çalışma Masası');
+  const [goal, setGoal] = useState<DeclutterGoal>('Genel Düzenleme & Alan Canlandırma');
   const [focusNotes, setFocusNotes] = useState<string>('');
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [selectedSampleId, setSelectedSampleId] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
 
   const handleFileChange = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (JPG, PNG, WebP).');
+      alert('Lütfen geçerli bir görsel dosyası yükleyin (JPG, PNG, WebP).');
       return;
     }
     try {
@@ -66,7 +66,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       setMimeType(res.mimeType);
       setSelectedSampleId(null);
     } catch (err) {
-      console.error('Error processing image:', err);
+      console.error('Görsel işleme hatası:', err);
     }
   };
 
@@ -88,7 +88,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       setSelectedImage(res.base64);
       setMimeType(res.mimeType);
     } catch (err) {
-      console.warn('Could not convert sample image to base64, using raw URL for preview:', err);
+      console.warn('Örnek görsel base64 dönüştürme hatası, direkt URL kullanılıyor:', err);
       setSelectedImage(sample.imageUrl);
     } finally {
       setIsLoadingSample(false);
@@ -111,10 +111,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
       {/* Hero Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
         <h1 className="text-3xl sm:text-4xl font-semibold text-stone-900 tracking-tight">
-          Transform Clutter Into Clarity
+          Dağınıklığı Düzen ve Huzura Dönüştürün
         </h1>
         <p className="mt-2 text-stone-600 text-sm sm:text-base">
-          Upload a room photo to receive Gemini AI spatial analysis, a step-by-step 4-box declutter plan, and zone-by-zone organization solutions.
+          Odanızın fotoğrafını yükleyin; Gemini AI görsel analiziyle 4-Kutu yöntemi adım adım düzenleme planı ve bölge bazlı akıllı çözümler sunsun.
         </p>
       </div>
 
@@ -122,7 +122,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start space-x-3">
           <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
           <div className="text-sm">
-            <p className="font-medium">Analysis encountered an issue</p>
+            <p className="font-medium">Analiz sırasında bir sorun oluştu</p>
             <p className="text-rose-700 mt-0.5">{analysisError}</p>
           </div>
         </div>
@@ -133,7 +133,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-white rounded-2xl border border-stone-200 shadow-xs p-5 sm:p-6">
             <h2 className="text-base font-semibold text-stone-900 mb-3 flex items-center justify-between">
-              <span>1. Upload Room Photo</span>
+              <span>1. Oda Fotoğrafı Yükleyin</span>
               {selectedImage && (
                 <button
                   type="button"
@@ -141,9 +141,9 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                     setSelectedImage(null);
                     setSelectedSampleId(null);
                   }}
-                  className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+                  className="text-xs text-rose-600 hover:text-rose-700 font-medium cursor-pointer"
                 >
-                  Change Photo
+                  Fotoğrafı Değiştir
                 </button>
               )}
             </h2>
@@ -189,9 +189,9 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                   </div>
 
                   <p className="text-sm font-semibold text-stone-800">
-                    Click to browse or drag &amp; drop room photo
+                    Göz atmak için tıklayın veya fotoğrafı buraya sürükleyin
                   </p>
-                  <p className="text-xs text-stone-500 mt-1">Supports JPG, PNG, WebP up to 20MB</p>
+                  <p className="text-xs text-stone-500 mt-1">JPG, PNG, WebP formatları desteklenir (20MB'a kadar)</p>
 
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                     <button
@@ -200,10 +200,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                         e.stopPropagation();
                         cameraInputRef.current?.click();
                       }}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 shadow-2xs"
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 shadow-2xs cursor-pointer"
                     >
                       <Camera className="w-3.5 h-3.5 mr-1.5 text-stone-600" />
-                      Take Photo with Camera
+                      Kamera ile Çek
                     </button>
                     <button
                       type="button"
@@ -211,10 +211,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                         e.stopPropagation();
                         fileInputRef.current?.click();
                       }}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 shadow-2xs"
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-stone-300 text-stone-700 hover:bg-stone-100 shadow-2xs cursor-pointer"
                     >
                       <ImageIcon className="w-3.5 h-3.5 mr-1.5 text-stone-600" />
-                      Browse Files
+                      Dosyalara Göz At
                     </button>
                   </div>
                 </div>
@@ -223,22 +223,22 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
               <div className="relative rounded-xl overflow-hidden border border-stone-200 bg-stone-900 group">
                 <img
                   src={selectedImage}
-                  alt="Room to analyze"
+                  alt="Analiz edilecek oda"
                   className="w-full h-80 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
                   <span className="bg-black/50 backdrop-blur px-2.5 py-1 rounded-md">
-                    Ready for Gemini Spatial Analysis
+                    Gemini Mekansal Analizi İçin Hazır
                   </span>
                   <button
                     onClick={() => {
                       setSelectedImage(null);
                       setSelectedSampleId(null);
                     }}
-                    className="bg-white/90 hover:bg-white text-stone-900 px-3 py-1 rounded-md font-medium transition"
+                    className="bg-white/90 hover:bg-white text-stone-900 px-3 py-1 rounded-md font-medium transition cursor-pointer"
                   >
-                    Replace Photo
+                    Fotoğrafı Değiştir
                   </button>
                 </div>
               </div>
@@ -248,11 +248,11 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             <div className="mt-6 pt-5 border-t border-stone-200">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">
-                  Or test with sample rooms:
+                  Veya hazır örnek odalarla hemen deneyin:
                 </span>
                 {isLoadingSample && (
                   <span className="text-xs text-emerald-600 flex items-center">
-                    <Loader2 className="w-3 h-3 animate-spin mr-1" /> Loading sample...
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" /> Örnek hazırlanıyor...
                   </span>
                 )}
               </div>
@@ -262,7 +262,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                     key={sample.id}
                     type="button"
                     onClick={() => handleSelectSample(sample)}
-                    className={`text-left p-2 rounded-xl border transition group overflow-hidden ${
+                    className={`text-left p-2 rounded-xl border transition group overflow-hidden cursor-pointer ${
                       selectedSampleId === sample.id
                         ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20'
                         : 'border-stone-200 hover:border-stone-300 bg-stone-50/50'
@@ -273,16 +273,16 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
                         src={sample.imageUrl}
                         alt={sample.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                        referrerPolicy="no-referrer"
+                        loading="eager"
                       />
                       {selectedSampleId === sample.id && (
-                        <div className="absolute top-1 right-1 bg-emerald-600 text-white p-0.5 rounded-full">
+                        <div className="absolute top-1 right-1 bg-emerald-600 text-white p-0.5 rounded-full shadow-xs">
                           <Check className="w-3 h-3" />
                         </div>
                       )}
                     </div>
                     <div className="text-xs font-medium text-stone-900 truncate">{sample.name}</div>
-                    <div className="text-[10px] text-stone-500 truncate">{sample.roomType}</div>
+                    <div className="text-[10px] text-stone-500 truncate">{sample.description}</div>
                   </button>
                 ))}
               </div>
@@ -293,12 +293,12 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
         {/* Right Column: Customization Parameters & Action Trigger */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-white rounded-2xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-5">
-            <h2 className="text-base font-semibold text-stone-900">2. Room Details &amp; Goal</h2>
+            <h2 className="text-base font-semibold text-stone-900">2. Oda Detayları ve Hedefiniz</h2>
 
             {/* Room Type Picker */}
             <div>
               <label htmlFor="select-room-type" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
-                Room Type
+                Oda Türü
               </label>
               <select
                 id="select-room-type"
@@ -317,7 +317,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             {/* Primary Decluttering Goal */}
             <div>
               <label htmlFor="select-declutter-goal" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
-                Primary Goal
+                Öncelikli Hedef
               </label>
               <select
                 id="select-declutter-goal"
@@ -336,14 +336,14 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             {/* Specific Notes / Pain Points */}
             <div>
               <label htmlFor="input-focus-notes" className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
-                Specific Concerns or Pain Points <span className="text-stone-400 font-normal">(Optional)</span>
+                Özel Notlar veya Rahatsız Eden Noktalar <span className="text-stone-400 font-normal">(İsteğe Bağlı)</span>
               </label>
               <textarea
                 id="input-focus-notes"
                 rows={3}
                 value={focusNotes}
                 onChange={(e) => setFocusNotes(e.target.value)}
-                placeholder="e.g., The desk cables are a hazard; I have too many loose papers; need ideas for where to put books."
+                placeholder="Örn: Masanın altındaki kablolar çok karışık; çok fazla kağıt ve evrak birikti; kitapları koyacak yer bulamıyorum."
                 className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 placeholder-stone-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-hidden resize-none"
               />
             </div>
@@ -352,10 +352,10 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
             <div className="rounded-xl bg-stone-50 border border-stone-200/80 p-3.5 text-xs text-stone-600 space-y-1">
               <div className="font-semibold text-stone-900 flex items-center">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600 mr-1.5 shrink-0" />
-                The 4-Box Method Plan
+                4-Kutu Yöntemi Planı
               </div>
               <p>
-                Gemini will categorize identified items into Keep, Donate/Sell, Relocate, and Trash/Recycle with actionable micro-steps.
+                Gemini; tespit edilen eşyaları <strong>Sakla</strong>, <strong>Bağışla/Sat</strong>, <strong>Yerini Değiştir</strong> ve <strong>At/Geri Dönüştür</strong> olarak kategorize ederek uygulanabilir mikro adımlara böler.
               </p>
             </div>
 
@@ -374,12 +374,12 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Analyzing Room with Gemini Vision...</span>
+                  <span>Gemini Vision ile Oda Analiz Ediliyor...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
-                  <span>Analyze Room &amp; Generate Plan</span>
+                  <span>Odayı Analiz Et &amp; Plan Oluştur</span>
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </>
               )}

@@ -1,4 +1,14 @@
 export type RoomType =
+  | 'Ev Ofisi / Çalışma Masası'
+  | 'Oturma Odası / Salon'
+  | 'Yatak Odası'
+  | 'Mutfak & Kiler'
+  | 'Gardırop & Giysi Dolabı'
+  | 'Banyo'
+  | 'Depo & Garaj'
+  | 'Yemek Odası'
+  | 'Antre / Koridor'
+  | 'Çocuk Odası'
   | 'Home Office'
   | 'Living Room'
   | 'Bedroom'
@@ -11,6 +21,12 @@ export type RoomType =
   | 'Kids Room';
 
 export type DeclutterGoal =
+  | 'Genel Düzenleme & Alan Canlandırma'
+  | 'Derinlemesine 4 Kutu Yöntemi (Sakla/Bağışla/At)'
+  | 'Maksimum Depolama & Zemin Alanı Kazanma'
+  | 'Masa & Kablo Yönetimi'
+  | 'Gardırop & Dolap Sadeleştirme'
+  | '15 Dakikalık Acil Toparlama'
   | 'General Decluttering & Space Revival'
   | 'Deep 4-Box Purge (Keep/Donate/Trash)'
   | 'Maximize Storage & Floor Space'
